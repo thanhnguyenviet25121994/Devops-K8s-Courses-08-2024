@@ -1,0 +1,29 @@
+*** Recommended - using /var/lib/rancher/k3s/server/db/
+1/ Backup:
+- Backup file /var/lib/rancher/k3s/server/db/
+- Backup file /var/lib/rancher/k3s/server/token
+- Backup file /var/lib/rancher/k3s/storage
+2/ restore:
+- Install k3s: curl -sfL https://get.k3s.io | sh -
+- Stop k3s service: service k3s stop
+- Restore file: put all backup files to the same directory
+- Delete all cert and key files in /var/lib/rancher/k3s/server/tls
+- Rename node: change node name to the same as old node name: hostnamectl set-hostname <old-node-name>
+- Change ip to the same ip of the old one
+- Reboot server
+- Restart k3s: service k3s restart
+- Check po status. Delete freezing po to create new PO if needed
+
+
+*** not recommend - using etcd:
+- backup script: 
+curl -sfL https://get.k3s.io | sh -s server - --cluster-init --token "1234" --write-kubeconfig-mode 644 --data-dir=/home/sf/etcd-data --etcd-snapshot-retention=72 --etcd-snapshot-dir=/home/sf/etcd-snapshots --etcd-snapshot-schedule-cron="* * * * *"ser
+
+
+- restore script:
+S1: curl -sfL https://get.k3s.io | sh
+S2: k3s-killall.sh
+S3: k3s server  --cluster-reset  --cluster-reset-restore-path=/home/sf/etcd-snapshots/etcd-snapshot-ubuntutest-1718761621 --token "1234" --etcd-snapshot-retention=72 --etcd-snapshot-dir=/home/sf/etcd-snapshots --etcd-snapshot-schedule-cron="* * * * *" 
+S4: service k3s restart
+S5: recover statefulset data: scp -r pvc-412c40c5-a4a1-4456-88e0-69f959992043_default_mysql-persistent-storage-mysql-maisq-0/ sf@10.0.2.15:
+S6: copy statefulset data to storage: mkdir /home/sf/etcd-data/storage;cp -r /home/sf/pvc-412c40c5-a4a1-4456-88e0-69f959992043_default_mysql-persistent-storage-mysql-maisq-0/ /home/sf/etcd-data/storage
