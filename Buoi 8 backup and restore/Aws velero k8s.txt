@@ -73,15 +73,11 @@ EOF
 - Install and start velero
 
 *** add volume bacckup location
-velero install \
-    --provider aws \
-    --bucket test-velero-121351213 \
-    --secret-file ./credentials-velero \
-    --plugins velero/velero-plugin-for-aws:v1.0.0 \
+velero install     --backup-location-config region=us-east-1     --snapshot-location-config region=us-east-1     --provider aws     --bucket test-velero-121351213     --secret-file ./credentials-velero     --plugins velero/velero-plugin-for-aws:v1.0.0 
     
 
 - Backup a namespace:
-velero backup create hexabase-core-t --volume-snapshot-locations --include-namespaces hexabase-core
+velero backup create hexabase-core-t --include-namespaces hexabase-core
 
 - Check status: 
 velero backup describe hexabase-core-t
