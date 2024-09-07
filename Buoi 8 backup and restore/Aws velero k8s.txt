@@ -82,3 +82,6 @@ velero backup create hexabase-core-t --include-namespaces hexabase-core
 - Check status: 
 velero backup describe hexabase-core-t
 
+- restore:
+velero restore create --from-backup hexabase-core-t
+
